@@ -8,6 +8,8 @@ import { RemixBrowser } from "@remix-run/react";
 import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 
+// Hydration, following code will be send to front-en
+// browser will use following code to combine entry in front-end html with js function
 startTransition(() => {
   hydrateRoot(
     document,

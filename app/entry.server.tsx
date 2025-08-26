@@ -11,14 +11,13 @@ import { renderToReadableStream } from "react-dom/server";
 
 const ABORT_DELAY = 5000;
 
+// following function is used to deal with HTTP request.
+// In remix framework, remixContext contain the target URL
 export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
   remixContext: EntryContext,
-  // This is ignored so we can keep it in the template for visibility.  Feel
-  // free to delete this parameter in your app if you're not using it!
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   loadContext: AppLoadContext,
 ) {
   const controller = new AbortController();
@@ -26,6 +25,8 @@ export default async function handleRequest(
     controller.abort();
   }, ABORT_DELAY);
 
+  // following part is used to fetch and execute dynamic all pages under route by matching URL
+  // It will waiting for server end generate the target webpage
   const body = await renderToReadableStream(
     <RemixServer
       context={remixContext}

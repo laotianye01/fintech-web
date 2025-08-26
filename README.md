@@ -50,3 +50,22 @@ A live public deployment of this template is available at [https://to-do-list-kv
    ```bash
    npx wrangler tail
    ```
+
+## project discription
+* environment management: Node.js, a open source & multi-platform execution env for javascript
+* remex framework: 
+   * back-end will send HTML + js, and claims this is a Remix web. The broser will first shows the html to user, then it will add js to html secretly, which can present webpage to user quickly.
+   * file system is the routing system, every .jsx or .tsx under app/route is an URL->app/routes/_index.jsx is the root directory.
+   * Route file should contain all logics which are used to deal with back-end HTTP request(like click event) and front end interactive logic.
+
+
+* app: 
+   * entry.client.tsx: front-end user interact logic
+   * entry.server.tsx: back-end webpage render
+   * root.tsx: html backbone
+   * to-do-manager.ts: define how back-end interact with kv database
+   * routes
+      * $id.tsx: back-end data-related request processing
+
+* sever.ts: entry for application
+* wrangler.jsonc: set up db connection for web

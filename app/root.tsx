@@ -9,6 +9,8 @@ import type { LinksFunction } from "@remix-run/cloudflare";
 
 import "./tailwind.css";
 
+// main webpage layout template for all webpage under route flouder
+
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
