@@ -3,10 +3,14 @@ import {
   type ActionFunctionArgs,
 } from "@remix-run/cloudflare";
 import { useLoaderData, Form } from "@remix-run/react";
+import { useState } from "react";
+
 import { TodoManager } from "~/models/to-do-manager";
+import { Sidebar, TodoPanel, SchoolPanel, ContactPanel } from "~/components/id_components"
 
 // loader is used to handle get request for a remix URL
 // it's used to fetch all resources used to render the target html
+// each successful action call will trigger loader to refresh the page
 export const loader = async ({ params, context }: LoaderFunctionArgs) => {
   const todoManager = new TodoManager(
     context.cloudflare.env.TO_DO_LIST,
@@ -17,6 +21,7 @@ export const loader = async ({ params, context }: LoaderFunctionArgs) => {
 };
 
 // action is used to handle post request for a remix URL
+// following request will contain a string to match to certain case
 export async function action({ request, context, params }: ActionFunctionArgs) {
   const todoManager = new TodoManager(
     context.cloudflare.env.TO_DO_LIST,
@@ -54,71 +59,20 @@ export async function action({ request, context, params }: ActionFunctionArgs) {
 // default function renders the page using data from the `loader` function.
 // In Remix, the `<Form>` component handles user interaction.
 // When a user submits the form, `<Form>` automatically sends an HTTP request to the backend.
-export default function () {
+export default function MainPage() {
   const { todos } = useLoaderData<typeof loader>();
+  const [activePanel, setActivePanel] = useState("todo");
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8 px-4">
-      <div className="max-w-md mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-8">
-          Todo List
-        </h1>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
+      {/* 左侧菜单栏 */}
+      <Sidebar activePanel={activePanel} setActivePanel={setActivePanel} />
 
-        <Form method="post" className="mb-8 flex gap-2">
-          <input
-            type="text"
-            name="text"
-            className="flex-1 rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm px-4 py-2"
-            placeholder="Add a new todo..."
-          />
-          <button
-            type="submit"
-            name="intent"
-            value="create"
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
-          >
-            Add
-          </button>
-        </Form>
-
-        <ul className="space-y-2">
-          {todos.map((todo) => (
-            <li
-              key={todo.id}
-              className="flex items-center gap-2 bg-white dark:bg-gray-800 p-4 rounded-lg shadow"
-            >
-              <Form method="post" className="flex-1 flex items-center gap-2">
-                <input type="hidden" name="id" value={todo.id} />
-                <button
-                  type="submit"
-                  name="intent"
-                  value="toggle"
-                  className="text-gray-500 hover:text-blue-500"
-                >
-                  <span
-                    className={
-                      todo.completed ? "line-through text-gray-400" : ""
-                    }
-                  >
-                    {todo.text}
-                  </span>
-                </button>
-              </Form>
-
-              <Form method="post">
-                <input type="hidden" name="id" value={todo.id} />
-                <button
-                  type="submit"
-                  name="intent"
-                  value="delete"
-                  className="text-red-500 hover:text-red-700"
-                >
-                  Delete
-                </button>
-              </Form>
-            </li>
-          ))}
-        </ul>
+      {/* 右侧内容 */}
+      <div className="flex-1 p-8">
+        {activePanel === "todo" && <TodoPanel todos={todos} />}
+        {activePanel === "school" && <SchoolPanel />}
+        {activePanel === "contact" && <ContactPanel />}
       </div>
     </div>
   );
