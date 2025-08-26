@@ -53,6 +53,8 @@ A live public deployment of this template is available at [https://to-do-list-kv
 
 ## project discription
 * environment management: Node.js, a open source & multi-platform execution env for javascript
+* project properities:
+   1. serverless framework: The system does not rely on a dedicated server. It only uses the database and front-end logic, while each incoming request is dynamically handled by an available node in the cluster that is temporarily assigned to execute the job.
 * remex framework: 
    * back-end will send HTML + js, and claims this is a Remix web. The broser will first shows the html to user, then it will add js to html secretly, which can present webpage to user quickly.
    * file system is the routing system, every .jsx or .tsx under app/route is an URL->app/routes/_index.jsx is the root directory.
