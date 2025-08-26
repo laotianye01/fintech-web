@@ -3,8 +3,10 @@ import {
   type ActionFunctionArgs,
 } from "@remix-run/cloudflare";
 import { useLoaderData, Form } from "@remix-run/react";
-import { TodoManager } from "~/backend/to-do-manager";
+import { TodoManager } from "~/models/to-do-manager";
 
+// loader is used to handle get request for a remix URL
+// it's used to fetch all resources used to render the target html
 export const loader = async ({ params, context }: LoaderFunctionArgs) => {
   const todoManager = new TodoManager(
     context.cloudflare.env.TO_DO_LIST,
@@ -14,6 +16,7 @@ export const loader = async ({ params, context }: LoaderFunctionArgs) => {
   return { todos };
 };
 
+// action is used to handle post request for a remix URL
 export async function action({ request, context, params }: ActionFunctionArgs) {
   const todoManager = new TodoManager(
     context.cloudflare.env.TO_DO_LIST,
@@ -48,6 +51,9 @@ export async function action({ request, context, params }: ActionFunctionArgs) {
   }
 }
 
+// default function renders the page using data from the `loader` function.
+// In Remix, the `<Form>` component handles user interaction.
+// When a user submits the form, `<Form>` automatically sends an HTTP request to the backend.
 export default function () {
   const { todos } = useLoaderData<typeof loader>();
 

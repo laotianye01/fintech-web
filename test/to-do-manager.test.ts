@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, beforeEach } from "vitest";
-import { TodoManager } from "../app/backend/to-do-manager";
+import { TodoManager } from "../app/models/to-do-manager";
 import { env } from "cloudflare:test";
 
 describe("TodoManager", () => {
