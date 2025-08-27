@@ -24,6 +24,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
     resource: new ResourceManager(context.cloudflare.env.RESOURCE_LIST),
     mailbox: new MailboxManager(context.cloudflare.env.MAILBOX_LIST),
   };
+  await managers.todo.init();
 
   // 并行请求更高效
   const [todos, resources, mailboxes] = await Promise.all([
