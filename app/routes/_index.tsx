@@ -84,30 +84,47 @@ export async function action({ request, context }: ActionFunctionArgs) {
 // 以下代码于客户端运行
 // pooling default page
 export default function IndexPage() {
-  // useState为客户端的本地缓存，其变化时会刷新界面
-  const [activePanel, setActivePanel] = useState("todo");
+  // ----------------------
+  // activePanel 状态管理
+  // ----------------------
+  const [activePanel, setActivePanel] = useState<string | null>(null);
 
-  // loader 函数的客户端钩子，可以获取对应服务端 loader 返回的数据
-  // 以下代码中用服务端数据 initialTodos 给客户端变量 todos 初始化 
+  // 客户端挂载后读取 localStorage
+  useEffect(() => {
+    const savedPanel = window.localStorage.getItem("activePanel");
+    setActivePanel(savedPanel || "todo");
+  }, []);
+
+  // 当 activePanel 变化时写入 localStorage
+  useEffect(() => {
+    if (activePanel) {
+      window.localStorage.setItem("activePanel", activePanel);
+    }
+  }, [activePanel]);
+
+  // ----------------------
+  // loader 数据
+  // ----------------------
   const {
     todos: initialTodos,
     resources: initialResources,
     mailboxes: initialMailbox,
   } = useLoaderData<{ todos: any[]; resources: any[]; mailboxes: any[] }>();
 
-  // 使用一个 useEffect 来同步 loader 和 useState 的数据
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [resources, setResources] = useState<Resource[]>([]);
-  const [mailboxes, setMailbox] = useState<Mailbox[]>([]);
+  const [todos, setTodos] = useState<Todo[]>(initialTodos ?? []);
+  const [resources, setResources] = useState<Resource[]>(initialResources ?? []);
+  const [mailboxes, setMailbox] = useState<Mailbox[]>(initialMailbox ?? []);
 
-  // 同步 loader 数据到 state (在轮训前便执行，由于等待轮询来更新数据速度过慢)
+  // 同步 loader 数据到 state（首次加载）
   useEffect(() => {
     setTodos(initialTodos ?? []);
     setResources(initialResources ?? []);
     setMailbox(initialMailbox ?? []);
   }, [initialTodos, initialResources, initialMailbox]);
 
-  // 拉取最新数据
+  // ----------------------
+  // 定时轮询更新数据
+  // ----------------------
   const fetchAll = async () => {
     try {
       const res = await fetch("/pooling");
@@ -126,11 +143,15 @@ export default function IndexPage() {
     }
   };
 
-  // 一个定时器统一轮询
   useEffect(() => {
     const interval = setInterval(fetchAll, 3000);
     return () => clearInterval(interval);
   }, []);
+
+  // ----------------------
+  // 渲染 UI
+  // ----------------------
+  if (!activePanel) return null; // 初始挂载时不渲染，避免闪烁
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
