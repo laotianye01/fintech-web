@@ -53,23 +53,76 @@ export async function action({ request, context }: ActionFunctionArgs) {
 // When submitted, <Form> automatically sends an HTTP request to the server.
 // For purely client-side interactions (like UI switching), normal JS event handlers are used.
 // The parent (default) component holds shared state and passes update functions to child components.
+
+// pooling default page
+// export default function IndexPage() {
+//   const [activePanel, setActivePanel] = useState("todo");
+//   const { todos: initialTodos } = useLoaderData<{ todos: any[] }>();
+//   const [todos, setTodos] = useState<any[]>(initialTodos);
+
+//   // 封装一个函数用于获取最新 todo
+//   const fetchTodos = async () => {
+//     try {
+//       const res = await fetch("/pooling"); // GET
+//       if (!res.ok) return;
+//       const data: { todos?: any[] } = await res.json();
+//       if (data.todos) setTodos(data.todos);
+//     } catch (err) {
+//       console.error("Failed to fetch todos:", err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     // 每 3 秒轮询一次数据库
+//     const interval = setInterval(fetchTodos, 3000);
+//     return () => clearInterval(interval);
+//   }, []);
+  
+//   return (
+//     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
+//       <Sidebar activePanel={activePanel} setActivePanel={setActivePanel} />
+//       <div className="flex-1 p-8">
+//         {activePanel === "todo" && <TodoPanel todos={todos} />}
+//         {activePanel === "school" && <SchoolPanel />}
+//         {activePanel === "contact" && <ContactPanel />}
+//       </div>
+//     </div>
+//   );
+// }
+
+// SSE default page
 export default function IndexPage() {
   const [activePanel, setActivePanel] = useState("todo");
   const { todos: initialTodos } = useLoaderData<{ todos: any[] }>();
   const [todos, setTodos] = useState<any[]>(initialTodos);
+  const [sseStatus, setSseStatus] = useState("connecting"); // 用于判断 SSE 是否可用
 
+  // set up sse stream
   useEffect(() => {
-    // SSE 使用固定路径
-    const es = new EventSource(`/stream`);
+    const es = new EventSource("/stream"); // SSE loader 路径
+
     const handleEvent = (e: MessageEvent) => {
       try {
         const data = JSON.parse(e.data);
         if (data.todos) setTodos(data.todos);
-      } catch {}
+      } catch (err) {
+        console.error("Failed to parse SSE data:", err);
+      }
     };
 
     es.addEventListener("snapshot", handleEvent);
     es.addEventListener("todo_update", handleEvent);
+
+    es.onerror = (err) => {
+      console.error("SSE error:", err);
+      setSseStatus("error");
+      es.close();
+    };
+
+    es.onopen = () => {
+      setSseStatus("connected");
+      console.log("SSE connected");
+    };
 
     return () => es.close();
   }, []);
@@ -78,6 +131,9 @@ export default function IndexPage() {
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
       <Sidebar activePanel={activePanel} setActivePanel={setActivePanel} />
       <div className="flex-1 p-8">
+        <div className="mb-2 text-sm text-gray-500">
+          SSE Status: {sseStatus}
+        </div>
         {activePanel === "todo" && <TodoPanel todos={todos} />}
         {activePanel === "school" && <SchoolPanel />}
         {activePanel === "contact" && <ContactPanel />}

@@ -9,15 +9,15 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   const stream = new ReadableStream({
     async start(controller) {
       const send = (data: unknown, event?: string) => {
-        let chunk = "";
-        if (event) chunk += `event: ${event}\n`;
-        chunk += `data: ${JSON.stringify(data)}\n\n`;
-        controller.enqueue(encoder.encode(chunk));
+        try {
+          let chunk = "";
+          if (event) chunk += `event: ${event}\n`;
+          chunk += `data: ${JSON.stringify(data)}\n\n`;
+          controller.enqueue(encoder.encode(chunk));
+        } catch (err) {
+          console.error("Failed to send SSE data:", err);
+        }
       };
-
-      // 首次推送快照
-      const todos = await todoManager.list();
-      send({ todos }, "snapshot");
 
       // 心跳
       const keepAlive = setInterval(() => {
@@ -26,14 +26,21 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
       // 轮询更新
       const poll = setInterval(async () => {
-        const todos = await todoManager.list();
-        send({ todos }, "todo_update");
-      }, 5000);
+        if (signal.aborted) return; // 客户端关闭时停止
+        try {
+          const todos = await todoManager.list();
+          send({ todos }, "todo_update");
+        } catch (err) {
+          console.error("Failed to fetch todos:", err);
+        }
+      }, 2000);
 
+      // 监听 abort
       signal.addEventListener("abort", () => {
         clearInterval(keepAlive);
         clearInterval(poll);
         controller.close();
+        console.log("SSE connection aborted");
       });
     },
   });
