@@ -39,14 +39,19 @@ export class TodoManager {
   }
 
   /** 创建任务，接收时间参数 */
-  async create(text: string, dueTime?: number): Promise<Todo> {
+  async create(text: string, dueTime: number): Promise<Todo> {
+    if (!dueTime || dueTime <= 0) {
+      throw new Error("Todo must have a valid dueTime");
+    }
+
     const newTodo: Todo = {
       id: crypto.randomUUID(),
       text,
       completed: false,
       createdAt: Date.now(),
-      dueTime: dueTime ?? 0,
+      dueTime,
     };
+
     const todos = await this.list();
     todos.push(newTodo);
     await this.kv.put(this.todosKey, JSON.stringify(todos));

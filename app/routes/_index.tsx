@@ -93,17 +93,31 @@ export default function IndexPage() {
     mailboxes: initialMailbox,
   } = useLoaderData<{ todos: any[]; resources: any[]; mailboxes: any[] }>();
 
-  const [todos, setTodos] = useState<Todo[]>(initialTodos ?? []);
-  const [resources, setResources] = useState<Resource[]>(initialResources ?? []);
-  const [mailboxes, setMailbox] = useState<Mailbox[]>(initialMailbox ?? []);
+  // 使用一个 useEffect 来同步 loader 和 useState 的数据
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [mailboxes, setMailbox] = useState<Mailbox[]>([]);
+
+  // 同步 loader 数据到 state
+  // 这个 useEffect 确保组件在接收到 loader 数据后立即更新状态
+  useEffect(() => {
+    setTodos(initialTodos ?? []);
+    setResources(initialResources ?? []);
+    setMailbox(initialMailbox ?? []);
+  }, [initialTodos, initialResources, initialMailbox]);
+
 
   // 拉取最新数据
   const fetchAll = async () => {
     try {
-      const res = await fetch("/pooling"); // 后端统一返回 { todos, resources, mailboxes }
+      const res = await fetch("/pooling");
       if (!res.ok) return;
 
-      const data = (await res.json()) as { todos?: any[]; resources?: any[]; mailboxes?: any[] };
+      const data = (await res.json()) as {
+        todos?: any[];
+        resources?: any[];
+        mailboxes?: any[];
+      };
       if (data.todos) setTodos(data.todos);
       if (data.resources) setResources(data.resources);
       if (data.mailboxes) setMailbox(data.mailboxes);
@@ -114,7 +128,7 @@ export default function IndexPage() {
 
   // 一个定时器统一轮询
   useEffect(() => {
-    const interval = setInterval(fetchAll, 2000);
+    const interval = setInterval(fetchAll, 3000);
     return () => clearInterval(interval);
   }, []);
 

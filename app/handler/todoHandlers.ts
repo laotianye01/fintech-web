@@ -4,21 +4,25 @@ export function createTodoHandlers(todoManager: TodoManager) {
   return {
     todo_create: async (fd: FormData) => {
       const text = fd.get("text");
-      const dateStr = fd.get("time"); // 这里现在只有 "YYYY-MM-DD"
+      const dateStr = fd.get("time"); // "YYYY-MM-DD"
 
       if (typeof text !== "string" || !text) {
         return Response.json({ error: "Invalid text" }, { status: 400 });
       }
 
-      let dueTime = 0;
-      if (typeof dateStr === "string" && dateStr.trim() !== "") {
-        // 自动补上 23:59
-        const date = new Date(dateStr + "T23:59:00");
-        dueTime = date.getTime();
+      // 如果没有填写日期，也返回一个错误提示
+      if (typeof dateStr !== "string" || dateStr.trim() === "") {
+        return Response.json({ error: "Due time is required" }, { status: 400 });
       }
 
+      // 自动补上 23:59
+      const date = new Date(dateStr);
+      date.setHours(23, 59, 0, 0);
+      const dueTime = date.getTime();
+
       await todoManager.create(text, dueTime);
-      return { success: true };
+      // 确保返回一个有效的 Response 对象
+      return Response.json({ success: true });
     },
 
     todo_delete: async (fd: FormData) => {
