@@ -114,7 +114,7 @@ export default function IndexPage() {
 
   // 一个定时器统一轮询
   useEffect(() => {
-    const interval = setInterval(fetchAll, 3000);
+    const interval = setInterval(fetchAll, 2000);
     return () => clearInterval(interval);
   }, []);
 

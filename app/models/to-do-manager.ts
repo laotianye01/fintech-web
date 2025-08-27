@@ -20,7 +20,7 @@ export class TodoManager {
     const now = Date.now();
     const filtered = todos.filter(todo => !todo.dueTime || todo.dueTime >= now);
     if (filtered.length !== todos.length) {
-      await this.kv.put(this.todosKey, JSON.stringify(filtered), { expirationTtl: 300 });
+      await this.kv.put(this.todosKey, JSON.stringify(filtered));
     }
   }
 
@@ -49,7 +49,7 @@ export class TodoManager {
     };
     const todos = await this.list();
     todos.push(newTodo);
-    await this.kv.put(this.todosKey, JSON.stringify(todos), { expirationTtl: 300 });
+    await this.kv.put(this.todosKey, JSON.stringify(todos));
     return newTodo;
   }
 
@@ -60,7 +60,7 @@ export class TodoManager {
     if (index === -1) throw new Error(`Todo with id ${id} not found`);
 
     todos[index].completed = !todos[index].completed;
-    await this.kv.put(this.todosKey, JSON.stringify(todos), { expirationTtl: 300 });
+    await this.kv.put(this.todosKey, JSON.stringify(todos));
     return todos[index];
   }
 
@@ -68,6 +68,6 @@ export class TodoManager {
   async delete(id: string): Promise<void> {
     const todos = await this.list();
     const filtered = todos.filter(todo => todo.id !== id);
-    await this.kv.put(this.todosKey, JSON.stringify(filtered), { expirationTtl: 300 });
+    await this.kv.put(this.todosKey, JSON.stringify(filtered));
   }
 }
