@@ -1,7 +1,7 @@
 # Project web
 
 <img width="1386" height="683" alt="image" src="https://github.com/user-attachments/assets/4ca97654-79f2-4b47-a10b-2870fb2ce801" />
-
+* this project is a modification of todo list app provided by cloudflare
 
 ## How It Works
 
