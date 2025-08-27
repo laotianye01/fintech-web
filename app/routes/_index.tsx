@@ -81,12 +81,14 @@ export async function action({ request, context }: ActionFunctionArgs) {
 // When submitted, <Form> automatically sends an HTTP request to the server.
 // For purely client-side interactions (like UI switching), normal JS event handlers are used.
 // The parent (default) component holds shared state and passes update functions to child components.
-
+// 以下代码于客户端运行
 // pooling default page
 export default function IndexPage() {
+  // useState为客户端的本地缓存，其变化时会刷新界面
   const [activePanel, setActivePanel] = useState("todo");
 
-  // loader 初始数据
+  // loader 函数的客户端钩子，可以获取对应服务端 loader 返回的数据
+  // 以下代码中用服务端数据 initialTodos 给客户端变量 todos 初始化 
   const {
     todos: initialTodos,
     resources: initialResources,
@@ -98,14 +100,12 @@ export default function IndexPage() {
   const [resources, setResources] = useState<Resource[]>([]);
   const [mailboxes, setMailbox] = useState<Mailbox[]>([]);
 
-  // 同步 loader 数据到 state
-  // 这个 useEffect 确保组件在接收到 loader 数据后立即更新状态
+  // 同步 loader 数据到 state (在轮训前便执行，由于等待轮询来更新数据速度过慢)
   useEffect(() => {
     setTodos(initialTodos ?? []);
     setResources(initialResources ?? []);
     setMailbox(initialMailbox ?? []);
   }, [initialTodos, initialResources, initialMailbox]);
-
 
   // 拉取最新数据
   const fetchAll = async () => {
