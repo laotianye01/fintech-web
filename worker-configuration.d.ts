@@ -2,4 +2,6 @@
 
 interface Env {
 	TO_DO_LIST: KVNamespace;
+	RESOURCE_LIST: KVNamespace; 
+	MAILBOX_LIST: KVNamespace; 
 }

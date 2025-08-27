@@ -15,6 +15,14 @@
     {
       "binding": "TO_DO_LIST",
       "id": "899ed60e3f154fac92a5e5da8b3b0575"
+    },
+    {
+      "binding": "RESOURCE_LIST",
+      "id": "1de63a0a55f9469b9bbe6101c091148b"
+    },
+    {
+      "binding": "MAILBOX_LIST",
+      "id": "15895ef7822e46bba6eceadca3abb909"
     }
   ]
 }
