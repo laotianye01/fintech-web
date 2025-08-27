@@ -15,6 +15,10 @@ import { createTodoHandlers } from "~/handler/todoHandlers";
 import { createResourceHandlers } from "~/handler/resourceHandlers";
 import { createMailboxHandlers } from "~/handler/mailboxHandlers";
 
+import { Todo } from "~/models/to-do-manager";
+import { Resource } from "~/models/resource-manager";
+import { Mailbox } from "~/models/mailbox-manager";
+
 // loader is used to handle get request for a remix URL
 // it's used to fetch all resources used to render the target html
 // each successful action call will trigger loader to refresh the page
@@ -89,9 +93,9 @@ export default function IndexPage() {
     mailboxes: initialMailbox,
   } = useLoaderData<{ todos: any[]; resources: any[]; mailboxes: any[] }>();
 
-  const [todos, setTodos] = useState<any[]>(initialTodos);
-  const [resources, setResources] = useState<any[]>(initialResources);
-  const [mailboxes, setMailbox] = useState<any[]>(initialMailbox);
+  const [todos, setTodos] = useState<Todo[]>(initialTodos ?? []);
+  const [resources, setResources] = useState<Resource[]>(initialResources ?? []);
+  const [mailboxes, setMailbox] = useState<Mailbox[]>(initialMailbox ?? []);
 
   // 拉取最新数据
   const fetchAll = async () => {

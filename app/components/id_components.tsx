@@ -54,8 +54,8 @@ export function TodoPanel({ todos }: { todos: Todo[] }) {
           placeholder="Add a new todo..."
         />
         <input
-          type="datetime-local"
-          name="time" // 或使用 dueTime，如果你想单独设置截止时间
+          type="date"
+          name="time"
           className="rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm px-4 py-2"
         />
         <button

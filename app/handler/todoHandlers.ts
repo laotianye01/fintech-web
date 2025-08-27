@@ -4,18 +4,20 @@ export function createTodoHandlers(todoManager: TodoManager) {
   return {
     todo_create: async (fd: FormData) => {
       const text = fd.get("text");
-      const timeStr = fd.get("time"); // 新增时间字段
+      const dateStr = fd.get("time"); // 这里现在只有 "YYYY-MM-DD"
 
       if (typeof text !== "string" || !text) {
         return Response.json({ error: "Invalid text" }, { status: 400 });
       }
 
-      if (typeof timeStr !== "string" || isNaN(Date.parse(timeStr))) {
-        return Response.json({ error: "Invalid time format" }, { status: 400 });
+      let dueTime = 0;
+      if (typeof dateStr === "string" && dateStr.trim() !== "") {
+        // 自动补上 23:59
+        const date = new Date(dateStr + "T23:59:00");
+        dueTime = date.getTime();
       }
 
-      const time = new Date(timeStr).getTime();
-      await todoManager.create(text, time);
+      await todoManager.create(text, dueTime);
       return { success: true };
     },
 
